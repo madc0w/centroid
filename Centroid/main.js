@@ -1,5 +1,5 @@
 maxDepth = 5;
-stepInterval = 20;
+stepInterval = 2;
 angles = {};
 t = 0;
 colors = [
@@ -41,18 +41,12 @@ function onLoad() {
 
 	var isDrawing = false;
 	setInterval(function() {
-		if (isDrawing) {
-			console.log("iteraion skipped");
-		} else {
-			isDrawing = true;
-			t++;
-			context.clearRect(0, 0, canvas.width, canvas.height);
-			drawRegions(p1, p2, p3);
-			movePoint(p1);
-			movePoint(p2);
-			movePoint(p3);
-			isDrawing = false;
-		}
+		t++;
+		context.clearRect(0, 0, canvas.width, canvas.height);
+		drawRegions(p1, p2, p3);
+		movePoint(p1);
+		movePoint(p2);
+		movePoint(p3);
 	}, stepInterval);
 }
 
@@ -80,7 +74,7 @@ function drawRegions(p1, p2, p3, id) {
 	if (type == "fractal") {
 		var vertices = [ p1, p2, p3 ];
 		var p = vertices[Math.floor(Math.random() * vertices.length)];
-		for (var j = 0; j < 2000; j++) {
+		for (var j = 0; j < 20000; j++) {
 			var i = Math.floor(Math.random() * vertices.length);
 			var target = vertices[i];
 			var mid = {
@@ -89,10 +83,8 @@ function drawRegions(p1, p2, p3, id) {
 			};
 			drawPoint(mid, 1, colors[i]);
 			p = mid;
+			stepColor(colors[i]);
 		}
-		stepColor(colors[0], 2000);
-		stepColor(colors[1], 2000);
-		stepColor(colors[2], 2000);
 	} else {
 		id = id || "";
 		if (type == "centroid") {
