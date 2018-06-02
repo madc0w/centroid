@@ -2,31 +2,33 @@ maxDepth = 5;
 stepInterval = 20;
 angles = {};
 t = 0;
+colors = [
+	{
+		h : 0,
+		hStep : 0.000001,
+		s : 1,
+		sStep : 0,
+		v : 0.8,
+		vStep : 0
+	},
+	{
+		h : 0.4,
+		hStep : 0.0000012,
+		s : 0.8,
+		sStep : 0,
+		v : 0.5,
+		vStep : 0
+	},
+	{
+		h : 0.8,
+		hStep : 0.0000015,
+		s : 0.8,
+		sStep : 0,
+		v : 0.5,
+		vStep : 0
+	}
+];
 
-color1 = {
-	h : 0,
-	hStep : 0.000001,
-	s : 1,
-	sStep : 0,
-	v : 0.8,
-	vStep : 0
-};
-color2 = {
-	h : 0.4,
-	hStep : 0.0000012,
-	s : 0.8,
-	sStep : 0,
-	v : 0.5,
-	vStep : 0
-};
-color3 = {
-	h : 0.8,
-	hStep : 0.0000015,
-	s : 0.8,
-	sStep : 0,
-	v : 0.5,
-	vStep : 0
-};
 
 function onLoad() {
 	typeSelect = document.getElementById("type-select");
@@ -75,47 +77,78 @@ function movePoint(p) {
 }
 
 function drawRegions(p1, p2, p3, id) {
-	id = id || "";
-	if (type == "centroid") {
-		var c = computeCentroid(p1, p2, p3);
-	} else {
-		var c = computeIncenter(p1, p2, p3);
-		if (type == "random-incenter") {
-			if (!angles[id]) {
-				angles[id] = {
-					vel : 0.1 * (Math.random() - 0.5),
-					a : 0,
-					rFactor : 0.4 + (Math.random() * 0.5),
-				};
-			}
-			angle = angles[id];
-			c = {
-				x : c.x + c.r * angle.rFactor * Math.cos(angle.a),
-				y : c.y + c.r * angle.rFactor * Math.sin(angle.a),
+	if (type == "fractal") {
+		var vertices = [ p1, p2, p3 ];
+		var p = vertices[Math.floor(Math.random() * vertices.length)];
+		for (var j = 0; j < 2000; j++) {
+			var i = Math.floor(Math.random() * vertices.length);
+			var target = vertices[i];
+			var mid = {
+				x : (p.x + target.x) / 2,
+				y : (p.y + target.y) / 2
 			};
-			angle.a += angle.vel;
+			drawPoint(mid, 1, colors[i]);
+			p = mid;
+		}
+		stepColor(colors[0], 2000);
+		stepColor(colors[1], 2000);
+		stepColor(colors[2], 2000);
+	} else {
+		id = id || "";
+		if (type == "centroid") {
+			var c = computeCentroid(p1, p2, p3);
+		} else if (type == "incenter" || type == "random-incenter") {
+			var c = computeIncenter(p1, p2, p3);
+			if (type == "random-incenter") {
+				if (!angles[id]) {
+					angles[id] = {
+						vel : 0.1 * (Math.random() - 0.5),
+						a : 0,
+						rFactor : 0.4 + (Math.random() * 0.5),
+					};
+				}
+				angle = angles[id];
+				c = {
+					x : c.x + c.r * angle.rFactor * Math.cos(angle.a),
+					y : c.y + c.r * angle.rFactor * Math.sin(angle.a),
+				};
+				angle.a += angle.vel;
+			}
+		}
+
+		//	var c = computeCentroid(p1, p2, p3);
+		//	var _distanceSq = distanceSq(centroid, p2);
+		//	console.log("_distanceSq", _distanceSq);
+		if (id.length > maxDepth) {
+			stepColor(colors[0]);
+			stepColor(colors[1]);
+			stepColor(colors[2]);
+			drawTriangle(p1, p2, c, colors[0]);
+			drawTriangle(p1, p3, c, colors[1]);
+			drawTriangle(p2, p3, c, colors[2]);
+		} else {
+			drawRegions(p1, p2, c, id + "1");
+			drawRegions(p1, p3, c, id + "2");
+			drawRegions(p2, p3, c, id + "3");
 		}
 	}
+}
 
-	//	var c = computeCentroid(p1, p2, p3);
-	//	var _distanceSq = distanceSq(centroid, p2);
-	//	console.log("_distanceSq", _distanceSq);
-	if (id.length > maxDepth) {
-		stepColor(color1);
-		stepColor(color2);
-		stepColor(color3);
-		drawTriangle(p1, p2, c, hsvToRgb(color1));
-		drawTriangle(p1, p3, c, hsvToRgb(color2));
-		drawTriangle(p2, p3, c, hsvToRgb(color3));
-	} else {
-		drawRegions(p1, p2, c, id + "1");
-		drawRegions(p1, p3, c, id + "2");
-		drawRegions(p2, p3, c, id + "3");
+function drawPoint(p, r, color) {
+	context.beginPath();
+	if (color) {
+		color = hsvToRgb(color);
 	}
+	context.fillStyle = color || "#f00";
+	context.arc(p.x, p.y, r || 4, 0, 2 * Math.PI);
+	context.fill();
 }
 
 function drawTriangle(p1, p2, p3, color) {
 	context.beginPath();
+	if (color) {
+		color = hsvToRgb(color);
+	}
 	context.fillStyle = color || "#f00";
 	context.moveTo(p1.x, p1.y);
 	context.lineTo(p2.x, p2.y);
@@ -174,8 +207,9 @@ function randomPoint() {
 	};
 }
 
-function stepColor(color) {
-	color.h += color.hStep;
+function stepColor(color, factor) {
+	factor = factor || 1;
+	color.h += color.hStep * factor;
 	if (color.h > 1) {
 		color.hStep *= -1;
 		color.h = 2 - color.h;
@@ -184,7 +218,7 @@ function stepColor(color) {
 		color.h *= -1;
 	}
 
-	color.s += color.sStep;
+	color.s += color.sStep * factor;
 	if (color.s > 1) {
 		color.sStep *= -1;
 		color.s = 2 - color.s;
@@ -193,7 +227,7 @@ function stepColor(color) {
 		color.s *= -1;
 	}
 
-	color.v += color.vStep;
+	color.v += color.vStep * factor;
 	if (color.v > 1) {
 		color.vStep *= -1;
 		color.v = 2 - color.v;
