@@ -1,5 +1,7 @@
 maxDepth = 5;
 stepInterval = 20;
+angles = {};
+t = 0;
 
 color1 = {
 	h : 0,
@@ -39,6 +41,7 @@ function onLoad() {
 			console.log("iteraion skipped");
 		} else {
 			isDrawing = true;
+			t++;
 			context.clearRect(0, 0, canvas.width, canvas.height);
 			drawRegions(p1, p2, p3);
 			movePoint(p1);
@@ -69,22 +72,23 @@ function movePoint(p) {
 	}
 }
 
-function drawRegions(p1, p2, p3, depth) {
-	depth = depth || 0;
-	var centroid = computeCentroid(p1, p2, p3);
+function drawRegions(p1, p2, p3, id) {
+	id = id || "";
+	var c = computeIncenter(p1, p2, p3);
+	//	var c = computeCentroid(p1, p2, p3);
 	//	var _distanceSq = distanceSq(centroid, p2);
 	//	console.log("_distanceSq", _distanceSq);
-	if (depth > maxDepth) {
+	if (id.length > maxDepth) {
 		stepColor(color1);
 		stepColor(color2);
 		stepColor(color3);
-		drawTriangle(p1, p2, centroid, hsvToRgb(color1));
-		drawTriangle(p1, p3, centroid, hsvToRgb(color2));
-		drawTriangle(p2, p3, centroid, hsvToRgb(color3));
+		drawTriangle(p1, p2, c, hsvToRgb(color1));
+		drawTriangle(p1, p3, c, hsvToRgb(color2));
+		drawTriangle(p2, p3, c, hsvToRgb(color3));
 	} else {
-		drawRegions(p1, p2, centroid, depth + 1);
-		drawRegions(p1, p3, centroid, depth + 1);
-		drawRegions(p2, p3, centroid, depth + 1);
+		drawRegions(p1, p2, c, id + "1");
+		drawRegions(p1, p3, c, id + "2");
+		drawRegions(p2, p3, c, id + "3");
 	}
 }
 
@@ -97,6 +101,19 @@ function drawTriangle(p1, p2, p3, color) {
 	context.closePath();
 	context.fill();
 }
+
+function computeIncenter(p1, p2, p3) {
+	var a = Math.sqrt(distanceSq(p1, p2));
+	var b = Math.sqrt(distanceSq(p1, p3));
+	var c = Math.sqrt(distanceSq(p2, p3));
+	var sumDist = a + b + c;
+	return {
+		x : ((a * p3.x) + (b * p2.x) + (c * p1.x)) / sumDist,
+		y : ((a * p3.y) + (b * p2.y) + (c * p1.y)) / sumDist,
+		r : Math.sqrt((b + c - a) * (c + a - b) * (a + b - c) / sumDist) / 2
+	};
+}
+
 
 function computeCentroid(p1, p2, p3) {
 	var mid1 = {
