@@ -29,6 +29,8 @@ color3 = {
 };
 
 function onLoad() {
+	typeSelect = document.getElementById("type-select");
+	typeChanged();
 	canvas = document.getElementById("canvas");
 	context = canvas.getContext("2d");
 	var p1 = randomPoint();
@@ -74,7 +76,27 @@ function movePoint(p) {
 
 function drawRegions(p1, p2, p3, id) {
 	id = id || "";
-	var c = computeIncenter(p1, p2, p3);
+	if (type == "centroid") {
+		var c = computeCentroid(p1, p2, p3);
+	} else {
+		var c = computeIncenter(p1, p2, p3);
+		if (type == "random-incenter") {
+			if (!angles[id]) {
+				angles[id] = {
+					vel : 0.1 * (Math.random() - 0.5),
+					a : 0,
+					rFactor : 0.4 + (Math.random() * 0.5),
+				};
+			}
+			angle = angles[id];
+			c = {
+				x : c.x + c.r * angle.rFactor * Math.cos(angle.a),
+				y : c.y + c.r * angle.rFactor * Math.sin(angle.a),
+			};
+			angle.a += angle.vel;
+		}
+	}
+
 	//	var c = computeCentroid(p1, p2, p3);
 	//	var _distanceSq = distanceSq(centroid, p2);
 	//	console.log("_distanceSq", _distanceSq);
@@ -179,6 +201,11 @@ function stepColor(color) {
 		color.vStep *= -1;
 		color.v *= -1;
 	}
+}
+
+
+function typeChanged() {
+	type = typeSelect.selectedOptions[0].value;
 }
 
 
