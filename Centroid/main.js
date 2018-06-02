@@ -1,4 +1,5 @@
-maxDepth = 5;
+isRotatingPointMotion = true;
+maxDepth = 4;
 stepInterval = 2;
 angles = {};
 t = 0;
@@ -35,38 +36,77 @@ function onLoad() {
 	typeChanged();
 	canvas = document.getElementById("canvas");
 	context = canvas.getContext("2d");
-	var p1 = randomPoint();
-	var p2 = randomPoint();
-	var p3 = randomPoint();
+	var p1,
+		p2,
+		p3;
+	if (isRotatingPointMotion) {
+		p1 = {
+			center : {
+				x : canvas.width / 4,
+				y : canvas.height / 4,
+			},
+			angle : 0,
+			angleVel : 0.08 * (Math.random() - 0.5),
+			r : canvas.width / 4,
+		};
+		p2 = {
+			center : {
+				x : canvas.width * 3 / 4,
+				y : canvas.height / 4,
+			},
+			angle : 0,
+			angleVel : 0.08 * (Math.random() - 0.5),
+			r : canvas.width / 4,
+		};
+		p3 = {
+			center : {
+				x : canvas.width / 2,
+				y : canvas.height * 3 / 4,
+			},
+			angle : 0,
+			angleVel : 0.08 * (Math.random() - 0.5),
+			r : canvas.width / 4,
+		};
+	} else {
+		p1 = randomPoint();
+		p2 = randomPoint();
+		p3 = randomPoint();
+	}
 
 	var isDrawing = false;
 	setInterval(function() {
-		t++;
 		context.clearRect(0, 0, canvas.width, canvas.height);
-		drawRegions(p1, p2, p3);
 		movePoint(p1);
 		movePoint(p2);
 		movePoint(p3);
+		drawRegions(p1, p2, p3);
+		t++;
 	}, stepInterval);
 }
 
 function movePoint(p) {
-	p.x += p.xvel;
-	if (p.x < 0) {
-		p.x = -p.x;
-		p.xvel = -p.xvel;
-	} else if (p.x > canvas.width) {
-		p.x = 2 * canvas.width - p.x;
-		p.xvel = -p.xvel;
-	}
+	if (isRotatingPointMotion) {
+		p.x = p.center.x + p.r * Math.cos(p.angle);
+		p.y = p.center.y + p.r * Math.sin(p.angle);
+		p.angle += p.angleVel;
+	} else {
+		p.x += p.xvel;
+		if (p.x < 0) {
+			p.x = -p.x;
+			p.xvel = -p.xvel;
+		} else if (p.x > canvas.width) {
+			p.x = 2 * canvas.width - p.x;
+			p.xvel = -p.xvel;
+		}
 
-	p.y += p.yvel;
-	if (p.y < 0) {
-		p.y = -p.y;
-		p.yvel = -p.yvel;
-	} else if (p.y > canvas.height) {
-		p.y = 2 * canvas.height - p.y;
-		p.yvel = -p.yvel;
+		p.y += p.yvel;
+		if (p.y < 0) {
+			p.y = -p.y;
+			p.yvel = -p.yvel;
+		} else if (p.y > canvas.height) {
+			p.y = 2 * canvas.height - p.y;
+			p.yvel = -p.yvel;
+		}
 	}
 }
 
@@ -74,7 +114,7 @@ function drawRegions(p1, p2, p3, id) {
 	if (type == "fractal") {
 		var vertices = [ p1, p2, p3 ];
 		var p = vertices[Math.floor(Math.random() * vertices.length)];
-		for (var j = 0; j < 20000; j++) {
+		for (var j = 0; j < 2000; j++) {
 			var i = Math.floor(Math.random() * vertices.length);
 			var target = vertices[i];
 			var mid = {
