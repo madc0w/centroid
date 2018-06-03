@@ -7,7 +7,7 @@ colors = [
 	{
 		h : 0,
 		hStep : 0.000001,
-		s : 1,
+		s : 0.4,
 		sStep : 0,
 		v : 0.8,
 		vStep : 0
@@ -15,17 +15,17 @@ colors = [
 	{
 		h : 0.4,
 		hStep : 0.0000012,
-		s : 0.8,
-		sStep : 0,
-		v : 0.5,
+		s : 0.2,
+		sStep : 0.0000001,
+		v : 1,
 		vStep : 0
 	},
 	{
 		h : 0.8,
 		hStep : 0.0000015,
-		s : 0.8,
+		s : 0.2,
 		sStep : 0,
-		v : 0.5,
+		v : 0.8,
 		vStep : 0
 	}
 ];

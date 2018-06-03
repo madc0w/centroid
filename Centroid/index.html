@@ -8,12 +8,15 @@
 <title>Centroid</title>
 </head>
 <body onLoad="onLoad();">
-	<select id="type-select" onChange="typeChanged();">
-		<option value="random-incenter">Random rotation about incenter</option>
-		<option value="incenter">Incenter</option>
-		<option value="centroid">Centroid</option>
-		<option value="fractal">Sierpinski Fractal</option>
-	</select>
+	<div id="header">
+		<label>Type:</label>
+		<select id="type-select" onChange="typeChanged();">
+			<option value="random-incenter">Random rotation about incenter</option>
+			<option value="incenter">Incenter</option>
+			<option value="centroid">Centroid</option>
+			<option value="fractal">Sierpinski Fractal</option>
+		</select>
+	</div>
 	<canvas id="canvas" height="800" width="800"></canvas>
 </body>
 </html>

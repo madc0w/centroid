@@ -1,8 +1,14 @@
 body {
 	background-color: #ddd;
+	font-family: Arial;
 }
 
 #canvas {
 	background-color: #fff;
 	border-radius: 8px;
+}
+
+#header {
+	height: 32px;
+	font-size: 20px;	
 }
