@@ -31,6 +31,9 @@ colors = [
 ];
 
 
+xFractalFactor = 1;
+yFractalFactor = 1;
+
 function onLoad() {
 	typeSelect = document.getElementById("type-select");
 	typeChanged();
@@ -118,13 +121,16 @@ function drawRegions(p1, p2, p3, id) {
 			var i = Math.floor(Math.random() * vertices.length);
 			var target = vertices[i];
 			var mid = {
-				x : (p.x + target.x) / 2,
-				y : (p.y + target.y) / 2
+				x : (p.x + target.x) / xFractalFactor,
+				y : (p.y + target.y) / yFractalFactor
 			};
 			drawPoint(mid, 1, colors[i]);
 			p = mid;
 			stepColor(colors[i]);
 		}
+
+		xFractalFactor = 1.5 + Math.sin(t / 1000);
+		yFractalFactor = 1.5 + Math.sin(t / 1000);
 	} else {
 		id = id || "";
 		if (type == "centroid") {
